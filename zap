@@ -152,14 +152,12 @@ while IFS= read -r k; do
   parts+=("$(jq --argjson k "$k" --raw-output '.partitiontable.partitions[$k].node' <<<"$json")")
 done < <(jq '.partitiontable.partitions | keys[]' <<<"$json")
 
-if ((mkboot)); then
+if ((!mkboot)); then
+  blkdev="${parts[0]}"
+else
   bootfs="${parts[0]}"
   blkdev="${parts[1]}"
-else
-  blkdev="${parts[0]}"
-fi
 
-if ((mkboot)); then
   if ! skip bootlbl; then
     read -rep "Which label should the boot file system have? [$bootlbl] " input
     if [[ -n $input ]]; then
